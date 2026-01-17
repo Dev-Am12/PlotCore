@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My Datasets</title>
+</head>
+
+<body>
+    <h1>My Datasets</h1>
+
+    <a href="/datasets/upload/">Upload New Dataset</a>
+    <hr>
+
+    {% if datasets %}
+    <ul>
+        {% for dataset in datasets %}
+        <li>
+            <strong>
+                <a href="/datasets/{{ dataset.id }}/">
+                    {{ dataset.name }}
+                </a>
+            </strong>
+            <br>
+            File: <a href="{{ dataset.file.url }}">{{ dataset.file.name }}</a><br>
+            Created at {{ dataset.created_at }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No datasets found.</p>
+    {% endif %}
+</body>
+
+</html>

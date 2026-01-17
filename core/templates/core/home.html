@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>InsightHub</title>
+</head>
+
+<body>
+    <h1>Welcome to InsightHub 🚀</h1>
+
+    {% if user.is_authenticated %}
+    <p>Hello, {{ user.username }}</p>
+    <a href="/datasets/">My Datasets</a><br><br>
+
+    <form method="post" action="/accounts/logout/">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+    {% else %}
+    <a href="/accounts/login/">Login</a>
+    {% endif %}
+</body>
+
+</html>

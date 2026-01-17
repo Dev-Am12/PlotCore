@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Dataset</title>
+</head>
+<body>
+    <h1>Upload CSV Dataset</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Dataset Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>CSV File:</label><br>
+        <input type="file" name="file" accept=".csv" required><br><br>
+
+        <button type="submit">Upload</button>
+    </form>
+
+    <br>
+    <a href="/datasets/">Back to My Datasets</a>
+</body>
+</html>

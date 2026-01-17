@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ dataset.name }} - Insights</title>
+</head>
+
+<body>
+    {% load custom_filters %}
+
+    <h1>{{ dataset.name }} — Dataset Insights</h1>
+
+    <p><strong>Rows:</strong> {{ num_rows }}</p>
+    <p><strong>Columns:</strong> {{ num_cols }}</p>
+
+    <h2>Column Details</h2>
+
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Column</th>
+            <th>Data Type</th>
+            <th>Missing Values</th>
+        </tr>
+        {% for col in columns %}
+        <tr>
+            <td>{{ col }}</td>
+            <td>{{ dtypes|get_item:col }}</td>
+            <td>{{ missing_values|get_item:col }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Visual Insights</h2>
+
+    <h3>Missing Values Chart</h3>
+    <img src="{{ missing_chart_url }}" alt="Missing Values Chart" width="800">
+
+    {% if histogram_url %}
+    <h3>Numeric Column Distribution</h3>
+    <img src="{{ histogram_url }}" alt="Histogram" width="800">
+    {% else %}
+    <p>No numeric columns available for histogram.</p>
+    {% endif %}
+
+
+    <br>
+    <a href="/datasets/">← Back to My Datasets</a>
+
+</body>
+
+</html>
