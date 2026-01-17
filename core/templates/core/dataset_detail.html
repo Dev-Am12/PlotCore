@@ -8,6 +8,10 @@
 <body>
     {% load custom_filters %}
 
+    {% if error %}
+    <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
     <h1>{{ dataset.name }} — Dataset Insights</h1>
 
     <p><strong>Rows:</strong> {{ num_rows }}</p>

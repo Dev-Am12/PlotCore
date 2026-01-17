@@ -20,9 +20,22 @@ def dataset_list(request):
 
 @login_required
 def upload_dataset(request):
+    error = None
+
     if request.method == 'POST':
-        name = request.POST['name']
-        file = request.FILES['file']
+        name = request.POST.get('name')
+        file = request.FILES.get('file')
+
+        # ---- BASIC VALIDATION ----
+        if not file.name.endswith('.csv'):
+            error = "Only CSV files are allowed."
+        elif file.size == 0:
+            error = "Uploaded file is empty / No data."
+
+        if error:
+            return render(request, 'core/upload_dataset.html', {
+                'error': error
+            })
 
         Dataset.objects.create(
             name=name,
@@ -34,14 +47,20 @@ def upload_dataset(request):
 
     return render(request, 'core/upload_dataset.html')
 
-
 # Dataset details view
 @login_required
 def dataset_detail(request, dataset_id):
     dataset = get_object_or_404(Dataset, id=dataset_id, owner=request.user)
 
     file_path = dataset.file.path
-    df = pd.read_csv(file_path)
+    #--Simple error catching before pandas read
+    try:
+        df = pd.read_csv(file_path)
+    except Exception as e:
+        return render(request, 'core/dataset_detail.html', {
+            'dataset': dataset,
+            'error': 'Unable to read CSV file. The file may be corrupted or invalid.'
+    })
 
     # ---- BASIC INSIGHTS ----
     num_rows, num_cols = df.shape
@@ -56,13 +75,21 @@ def dataset_detail(request, dataset_id):
     # ---- CHART 1: Missing Values Bar Chart ----
     missing_chart_path = os.path.join(charts_dir, f'missing_{dataset.id}.png')
 
-    plt.figure(figsize=(10, 4))
-    plt.bar(missing_values.keys(), missing_values.values())
-    plt.xticks(rotation=90)
-    plt.title('Missing Values per Column')
-    plt.tight_layout()
-    plt.savefig(missing_chart_path)
-    plt.close()
+    if not os.path.exists(missing_chart_path):
+        plt.figure(figsize=(12, 5))
+        plt.bar(
+            missing_values.keys(),
+            missing_values.values(),
+            color='#4C72B0'
+        )
+        plt.xticks(rotation=45, ha='right')
+        plt.xlabel('Columns')
+        plt.ylabel('Number of Missing Values')
+        plt.title('Missing Values per Column')
+        plt.grid(axis='y', linestyle='--', alpha=0.6)
+        plt.tight_layout()
+        plt.savefig(missing_chart_path)
+        plt.close()
 
     # ---- CHART 2: Histogram for First Numeric Column ----
     numeric_cols = df.select_dtypes(include='number').columns
@@ -72,14 +99,21 @@ def dataset_detail(request, dataset_id):
         col = numeric_cols[0]
         histogram_path = os.path.join(charts_dir, f'hist_{dataset.id}.png')
 
-        plt.figure()
-        df[col].dropna().hist(bins=30)
-        plt.title(f'Distribution of {col}')
-        plt.xlabel(col)
-        plt.ylabel('Frequency')
-        plt.tight_layout()
-        plt.savefig(histogram_path)
-        plt.close()
+        if not os.path.exists(histogram_path):
+            plt.figure(figsize=(8, 5))
+            plt.hist(
+                df[col].dropna(),
+                bins=30,
+                color='#55A868',
+                edgecolor='black'
+            )
+            plt.title(f'Distribution of {col}')
+            plt.xlabel(col)
+            plt.ylabel('Frequency')
+            plt.grid(axis='y', linestyle='--', alpha=0.6)
+            plt.tight_layout()
+            plt.savefig(histogram_path)
+            plt.close()
 
     context = {
         'dataset': dataset,
