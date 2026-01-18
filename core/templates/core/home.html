@@ -1,23 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>InsightHub</title>
-</head>
+{% extends "core/base.html" %}
 
-<body>
-    <h1>Welcome to InsightHub 🚀</h1>
+{% block title %}Home - PlotCore{% endblock %}
 
-    {% if user.is_authenticated %}
-    <p>Hello, {{ user.username }}</p>
-    <a href="/datasets/">My Datasets</a><br><br>
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="mb-3">Welcome to PlotCore 📊</h1>
+    <p class="lead">
+        Upload CSV datasets and instantly visualize insights.
+    </p>
 
-    <form method="post" action="/accounts/logout/">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-    {% else %}
-    <a href="/accounts/login/">Login</a>
+    {% if not user.is_authenticated %}
+        <a href="/accounts/login/" class="btn btn-primary mt-3">
+            Get Started
+        </a>
     {% endif %}
-</body>
-
-</html>
+</div>
+{% endblock %}

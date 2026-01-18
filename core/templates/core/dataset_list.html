@@ -1,34 +1,29 @@
-<!DOCTYPE html>
-<html>
+{% extends "core/base.html" %}
 
-<head>
-    <title>My Datasets</title>
-</head>
+{% block title %}My Datasets - PlotCore{% endblock %}
 
-<body>
-    <h1>My Datasets</h1>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>My Datasets</h2>
+    <a href="/datasets/upload/" class="btn btn-success">
+        Upload Dataset
+    </a>
+</div>
 
-    <a href="/datasets/upload/">Upload New Dataset</a>
-    <hr>
-
-    {% if datasets %}
-    <ul>
+{% if datasets %}
+    <ul class="list-group">
         {% for dataset in datasets %}
-        <li>
-            <strong>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
                 <a href="/datasets/{{ dataset.id }}/">
                     {{ dataset.name }}
                 </a>
-            </strong>
-            <br>
-            File: <a href="{{ dataset.file.url }}">{{ dataset.file.name }}</a><br>
-            Created at {{ dataset.created_at }}
-        </li>
+                <small class="text-muted">
+                    {{ dataset.created_at }}
+                </small>
+            </li>
         {% endfor %}
     </ul>
-    {% else %}
-    <p>No datasets found.</p>
-    {% endif %}
-</body>
-
-</html>
+{% else %}
+    <p class="text-muted">No datasets uploaded yet.</p>
+{% endif %}
+{% endblock %}

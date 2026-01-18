@@ -1,19 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login</h1>
+{% extends "core/base.html" %}
+{% block title %}Login - PlotCore{% endblock %}
 
-    {% if form.errors %}
-        <p style="color:red;">Invalid username or password</p>
-    {% endif %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h3 class="mb-3">Login</h3>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-</body>
-</html>
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                Invalid username or password.
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary w-100">
+                Login
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
