@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block title %}Delete Dataset - PlotCore{% endblock %}
+
+{% block content %}
+<h3>Delete Dataset</h3>
+
+<p>
+    Are you sure you want to delete
+    <strong>{{ dataset.name }}</strong>?
+</p>
+
+<p class="text-danger">
+    This action cannot be undone.
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+        Yes, delete
+    </button>
+    <a href="/datasets/" class="btn btn-secondary ms-2">
+        Cancel
+    </a>
+</form>
+{% endblock %}

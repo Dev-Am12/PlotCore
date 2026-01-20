@@ -34,6 +34,19 @@
 <h3>Missing Values Chart</h3>
 <img src="{{ missing_chart_url }}" alt="Missing Values Chart" width="800">
 
+{% if numeric_columns %}
+    <form method="get" class="mb-3">
+        <label class="form-label">Select numeric column:</label>
+        <select name="column" class="form-select" onchange="this.form.submit()">
+            {% for col in numeric_columns %}
+                <option value="{{ col }}" {% if col == selected_column %}selected{% endif %}>
+                    {{ col }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+{% endif %}
+
 {% if histogram_url %}
 <h3>Numeric Column Distribution</h3>
 <img src="{{ histogram_url }}" alt="Histogram" width="800">

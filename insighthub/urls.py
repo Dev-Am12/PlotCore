@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from core.views import home, dataset_list, upload_dataset, dataset_detail
+from core.views import home, dataset_list, upload_dataset, dataset_detail, delete_dataset
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -27,6 +27,7 @@ urlpatterns = [
     path('datasets/upload/', upload_dataset),
     path('accounts/', include('django.contrib.auth.urls')),
     path('datasets/<int:dataset_id>/', dataset_detail),
+    path('datasets/<int:dataset_id>/delete/', delete_dataset),
 ]
 
 if settings.DEBUG:

@@ -91,25 +91,30 @@ def dataset_detail(request, dataset_id):
         plt.savefig(missing_chart_path)
         plt.close()
 
-    # ---- CHART 2: Histogram for First Numeric Column ----
-    numeric_cols = df.select_dtypes(include='number').columns
+    # ---- CHART 2: Histogram for Selected Numeric Column ----
+    numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
+    selected_col = request.GET.get('column')
     histogram_path = None
-    if len(numeric_cols) > 0:
-        col = numeric_cols[0]
-        histogram_path = os.path.join(charts_dir, f'hist_{dataset.id}.png')
+
+    if numeric_cols:
+        if selected_col not in numeric_cols:
+            selected_col = numeric_cols[0]
+
+        histogram_filename = f'hist_{dataset.id}_{selected_col}.png'
+        histogram_path = os.path.join(charts_dir, histogram_filename)
 
         if not os.path.exists(histogram_path):
             plt.figure(figsize=(8, 5))
             plt.hist(
-                df[col].dropna(),
+                df[selected_col].dropna(),
                 bins=30,
                 color='#55A868',
                 edgecolor='black'
             )
-            plt.title(f'Distribution of {col}')
-            plt.xlabel(col)
+            plt.xlabel(selected_col)
             plt.ylabel('Frequency')
+            plt.title(f'Distribution of {selected_col}')
             plt.grid(axis='y', linestyle='--', alpha=0.6)
             plt.tight_layout()
             plt.savefig(histogram_path)
@@ -123,7 +128,33 @@ def dataset_detail(request, dataset_id):
         'dtypes': dtypes,
         'missing_values': missing_values,
         'missing_chart_url': settings.MEDIA_URL + f'charts/missing_{dataset.id}.png',
-        'histogram_url': settings.MEDIA_URL + f'charts/hist_{dataset.id}.png' if histogram_path else None,
+        'numeric_columns': numeric_cols,
+        'selected_column': selected_col,
+        'histogram_url': (
+            settings.MEDIA_URL + f'charts/hist_{dataset.id}_{selected_col}.png'
+            if histogram_path else None
+        ),
     }
 
     return render(request, 'core/dataset_detail.html', context)
+
+@login_required
+def delete_dataset(request, dataset_id):
+    dataset = get_object_or_404(Dataset, id=dataset_id, owner=request.user)
+
+    if request.method == 'POST':
+        # Delete CSV file
+        if dataset.file and os.path.exists(dataset.file.path):
+            os.remove(dataset.file.path)
+
+        # Delete related charts
+        charts_dir = os.path.join(settings.MEDIA_ROOT, 'charts')
+        if os.path.exists(charts_dir):
+            for file in os.listdir(charts_dir):
+                if file.startswith(f'hist_{dataset.id}_') or file.startswith(f'missing_{dataset.id}'):
+                    os.remove(os.path.join(charts_dir, file))
+
+        dataset.delete()
+        return redirect('/datasets/')
+
+    return render(request, 'core/confirm_delete.html', {'dataset': dataset})
