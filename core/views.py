@@ -2,11 +2,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .models import Dataset
-import pandas as pd
 import os
-import matplotlib
-matplotlib.use('Agg')  # IMPORTANT: non-GUI backend
-import matplotlib.pyplot as plt
+from .analysis.dataframe_summary import (
+    load_dataframe,
+    get_basic_summary,
+    get_numeric_columns
+)
+from .analysis.charts import (
+    generate_missing_values_chart,
+    generate_histogram,
+)
 
 def home(request):
     return render(request, 'core/home.html')
@@ -53,46 +58,32 @@ def dataset_detail(request, dataset_id):
     dataset = get_object_or_404(Dataset, id=dataset_id, owner=request.user)
 
     file_path = dataset.file.path
-    #--Simple error catching before pandas read
-    try:
-        df = pd.read_csv(file_path)
-    except Exception as e:
+    
+    # ---- Loading Dataframe & Summary (Error Catching) ----
+    df = load_dataframe(file_path)
+    if df is None:
         return render(request, 'core/dataset_detail.html', {
             'dataset': dataset,
             'error': 'Unable to read CSV file. The file may be corrupted or invalid.'
-    })
+        })
 
     # ---- BASIC INSIGHTS ----
-    num_rows, num_cols = df.shape
-    columns = df.columns.tolist()
-    dtypes = df.dtypes.astype(str).to_dict()
-    missing_values = df.isnull().sum().to_dict()
-
-    # ---- CHARTS DIRECTORY ----
-    charts_dir = os.path.join(settings.MEDIA_ROOT, 'charts')
-    os.makedirs(charts_dir, exist_ok=True)
+    summary = get_basic_summary(df)
+    num_rows = summary["num_rows"]
+    num_cols = summary["num_cols"]
+    columns = summary["columns"]
+    dtypes = summary["dtypes"]
+    missing_values = summary["missing_values"] 
 
     # ---- CHART 1: Missing Values Bar Chart ----
-    missing_chart_path = os.path.join(charts_dir, f'missing_{dataset.id}.png')
-
-    if not os.path.exists(missing_chart_path):
-        plt.figure(figsize=(12, 5))
-        plt.bar(
-            missing_values.keys(),
-            missing_values.values(),
-            color='#4C72B0'
-        )
-        plt.xticks(rotation=45, ha='right')
-        plt.xlabel('Columns')
-        plt.ylabel('Number of Missing Values')
-        plt.title('Missing Values per Column')
-        plt.grid(axis='y', linestyle='--', alpha=0.6)
-        plt.tight_layout()
-        plt.savefig(missing_chart_path)
-        plt.close()
+    missing_chart_path = generate_missing_values_chart(
+        dataset.id,
+        missing_values,
+        settings.MEDIA_ROOT
+    )
 
     # ---- CHART 2: Histogram for Selected Numeric Column ----
-    numeric_cols = df.select_dtypes(include='number').columns.tolist()
+    numeric_cols = get_numeric_columns(df)
 
     selected_col = request.GET.get('column')
     histogram_path = None
@@ -101,24 +92,12 @@ def dataset_detail(request, dataset_id):
         if selected_col not in numeric_cols:
             selected_col = numeric_cols[0]
 
-        histogram_filename = f'hist_{dataset.id}_{selected_col}.png'
-        histogram_path = os.path.join(charts_dir, histogram_filename)
-
-        if not os.path.exists(histogram_path):
-            plt.figure(figsize=(8, 5))
-            plt.hist(
-                df[selected_col].dropna(),
-                bins=30,
-                color='#55A868',
-                edgecolor='black'
-            )
-            plt.xlabel(selected_col)
-            plt.ylabel('Frequency')
-            plt.title(f'Distribution of {selected_col}')
-            plt.grid(axis='y', linestyle='--', alpha=0.6)
-            plt.tight_layout()
-            plt.savefig(histogram_path)
-            plt.close()
+        histogram_path = generate_histogram(
+            dataset.id,
+            df,
+            selected_col,
+            settings.MEDIA_ROOT
+        )
 
     context = {
         'dataset': dataset,
@@ -127,11 +106,11 @@ def dataset_detail(request, dataset_id):
         'columns': columns,
         'dtypes': dtypes,
         'missing_values': missing_values,
-        'missing_chart_url': settings.MEDIA_URL + f'charts/missing_{dataset.id}.png',
+        'missing_chart_url': settings.MEDIA_URL + missing_chart_path,
         'numeric_columns': numeric_cols,
         'selected_column': selected_col,
         'histogram_url': (
-            settings.MEDIA_URL + f'charts/hist_{dataset.id}_{selected_col}.png'
+            settings.MEDIA_URL + histogram_path
             if histogram_path else None
         ),
     }
