@@ -54,5 +54,18 @@
 <p>No numeric columns available for histogram.</p>
 {% endif %}
 <br>
+
+{% if boxplot_url %}
+  <hr>
+  <h5>Box Plot</h5>
+  <img src="{{ boxplot_url }}" class="img-fluid" alt="Box plot">
+{% endif %}
+
+{% if multi_boxplot_url %}
+  <hr>
+  <h5>Numeric Columns Comparison</h5>
+  <img src="{{ multi_boxplot_url }}" class="img-fluid" alt="Multi-column box plot">
+{% endif %}
+
 <a href="/datasets/">← Back to My Datasets</a>
 {% endblock %}

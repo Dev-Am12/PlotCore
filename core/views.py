@@ -11,6 +11,8 @@ from .analysis.dataframe_summary import (
 from .analysis.charts import (
     generate_missing_values_chart,
     generate_histogram,
+    generate_boxplot,
+    generate_multi_boxplot
 )
 
 def home(request):
@@ -99,6 +101,28 @@ def dataset_detail(request, dataset_id):
             settings.MEDIA_ROOT
         )
 
+    # ---- Chart 3: Boxplot for Numeric Columns (Single Column) ----
+    boxplot_path = None
+
+    if numeric_cols and selected_col:
+        boxplot_path = generate_boxplot(
+            dataset.id,
+            df,
+            selected_col,
+            settings.MEDIA_ROOT
+        )
+
+    # ---- Chart 4: Boxplot for Numeric Columns (Multi Columns) ----
+    multi_boxplot_path = None
+
+    if numeric_cols:
+        multi_boxplot_path = generate_multi_boxplot(
+            dataset.id,
+            df,
+            numeric_cols,
+            settings.MEDIA_ROOT
+        )
+
     context = {
         'dataset': dataset,
         'num_rows': num_rows,
@@ -112,6 +136,14 @@ def dataset_detail(request, dataset_id):
         'histogram_url': (
             settings.MEDIA_URL + histogram_path
             if histogram_path else None
+        ),
+        'boxplot_url': (
+            settings.MEDIA_URL + boxplot_path
+            if boxplot_path else None
+        ),
+        'multi_boxplot_url': (
+        settings.MEDIA_URL + multi_boxplot_path
+        if multi_boxplot_path else None
         ),
     }
 
