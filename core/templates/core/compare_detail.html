@@ -1,0 +1,81 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h3>Dataset Comparison</h3>
+
+<p>
+  <strong>Dataset A:</strong> {{ dataset_a.name }} <br>
+  <strong>Dataset B:</strong> {{ dataset_b.name }}
+</p>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% else %}
+
+<hr>
+<h5>Structure Comparison</h5>
+<ul>
+  <li>Rows: {{ structure.rows.0 }} vs {{ structure.rows.1 }}</li>
+  <li>Columns: {{ structure.columns.0 }} vs {{ structure.columns.1 }}</li>
+</ul>
+
+<p><strong>Common Columns:</strong></p>
+<ul>
+  {% for col in structure.common_columns %}
+  <li>{{ col }}</li>
+  {% empty %}
+  <li>No common columns</li>
+  {% endfor %}
+</ul>
+
+<p><strong>Only in Dataset A:</strong></p>
+<ul>
+  {% for col in structure.only_in_a %}
+  <li>{{ col }}</li>
+  {% empty %}
+  <li>None</li>
+  {% endfor %}
+</ul>
+
+<p><strong>Only in Dataset B:</strong></p>
+<ul>
+  {% for col in structure.only_in_b %}
+  <li>{{ col }}</li>
+  {% empty %}
+  <li>None</li>
+  {% endfor %}
+</ul>
+
+<hr>
+<h5>Data Type Mismatches</h5>
+<ul>
+  {% for col, types in dtype_mismatches.items %}
+  <li>{{ col }} → {{ types.0 }} vs {{ types.1 }}</li>
+  {% empty %}
+  <li>No data type mismatches</li>
+  {% endfor %}
+</ul>
+
+<hr>
+<h5>Missing Values Comparison</h5>
+<table class="table table-sm table-bordered">
+  <thead>
+    <tr>
+      <th>Column</th>
+      <th>{{ dataset_a.name }}</th>
+      <th>{{ dataset_b.name }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for col, values in missing_comparison.items %}
+    <tr>
+      <td>{{ col }}</td>
+      <td>{{ values.dataset_a }}</td>
+      <td>{{ values.dataset_b }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
+{% endblock %}

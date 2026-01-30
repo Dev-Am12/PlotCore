@@ -14,6 +14,11 @@ from .analysis.charts import (
     generate_boxplot,
     generate_multi_boxplot
 )
+from .analysis.comparison import (
+    compare_structure,
+    compare_dtypes,
+    compare_missing_values,
+)
 
 def home(request):
     return render(request, 'core/home.html')
@@ -169,3 +174,63 @@ def delete_dataset(request, dataset_id):
         return redirect('/datasets/')
 
     return render(request, 'core/confirm_delete.html', {'dataset': dataset})
+
+@login_required
+def compare_selector(request):
+    datasets = Dataset.objects.filter(owner=request.user)
+    error = None
+    if request.method == "POST":
+        dataset_a_id = request.POST.get("dataset_a")
+        dataset_b_id = request.POST.get("dataset_b")
+        if not dataset_a_id or not dataset_b_id:
+            error = "Please select two datasets."
+        elif dataset_a_id == dataset_b_id:
+            error = "Please select two different datasets."
+        else:
+            return redirect(
+                "compare_detail",
+                dataset_a_id=dataset_a_id,
+                dataset_b_id=dataset_b_id,
+            )
+
+    return render(request, "core/compare_selector.html", {"datasets": datasets, "error": error,})
+
+@login_required
+def compare_detail(request, dataset_a_id, dataset_b_id):
+    dataset_a = get_object_or_404(
+        Dataset, id=dataset_a_id, owner=request.user
+    )
+    dataset_b = get_object_or_404(
+        Dataset, id=dataset_b_id, owner=request.user
+    )
+        
+    df_a = load_dataframe(dataset_a.file.path)
+    df_b = load_dataframe(dataset_b.file.path)
+
+    if df_a is None or df_b is None:
+        return render(
+            request,
+            "core/compare_detail.html",
+            {
+                "dataset_a": dataset_a,
+                "dataset_b": dataset_b,
+                "error": "Unable to read one or both datasets.",
+            },
+        )
+
+    summary_a = get_basic_summary(df_a)
+    summary_b = get_basic_summary(df_b)
+
+    structure_comparison = compare_structure(summary_a, summary_b)
+    dtype_mismatches = compare_dtypes(summary_a, summary_b)
+    missing_comparison = compare_missing_values(summary_a, summary_b)
+
+    context = {
+        "dataset_a": dataset_a,
+        "dataset_b": dataset_b,
+        "structure": structure_comparison,
+        "dtype_mismatches": dtype_mismatches,
+        "missing_comparison": missing_comparison,
+    }
+
+    return render(request, "core/compare_detail.html", context)

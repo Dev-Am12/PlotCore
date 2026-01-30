@@ -5,9 +5,14 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>My Datasets</h2>
-    <a href="/datasets/upload/" class="btn btn-success">
-        Upload Dataset
-    </a>
+    <div class="d-flex gap-2 mb-3">
+        <a href="/datasets/compare/" class="btn btn-outline-secondary">
+            Compare Datasets
+        </a>
+        <a href="/datasets/upload/" class="btn btn-success">
+            Upload Dataset
+        </a>
+    </div>
 </div>
 
 {% if datasets %}

@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h3>Compare Datasets</h3>
+
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label class="form-label">Dataset A</label>
+    <select name="dataset_a" class="form-select">
+      <option value="">-- Select Dataset --</option>
+      {% for dataset in datasets %}
+        <option value="{{ dataset.id }}">{{ dataset.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Dataset B</label>
+    <select name="dataset_b" class="form-select">
+      <option value="">-- Select Dataset --</option>
+      {% for dataset in datasets %}
+        <option value="{{ dataset.id }}">{{ dataset.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">
+    Compare
+  </button>
+</form>
+{% endblock %}

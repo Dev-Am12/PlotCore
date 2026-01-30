@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from core.views import home, dataset_list, upload_dataset, dataset_detail, delete_dataset
+from core.views import home, dataset_list, upload_dataset, dataset_detail, delete_dataset, compare_selector, compare_detail
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -28,6 +28,8 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('datasets/<int:dataset_id>/', dataset_detail),
     path('datasets/<int:dataset_id>/delete/', delete_dataset),
+    path("datasets/compare/", compare_selector),
+    path("datasets/compare/<int:dataset_a_id>/<int:dataset_b_id>/", compare_detail, name="compare_detail"), #name used because we are reversing the URL search for Django from View to URL
 ]
 
 if settings.DEBUG:
