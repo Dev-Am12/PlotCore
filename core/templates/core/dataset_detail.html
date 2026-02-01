@@ -3,69 +3,111 @@
 {% block title %}{{ dataset.name }} - PlotCore{% endblock %}
 
 {% block content %}
+
 {% if error %}
-<p style="color:red;">{{ error }}</p>
+<div class="alert alert-danger">
+    {{ error }}
+</div>
 {% endif %}
 
-<h1>{{ dataset.name }} — Dataset Insights</h1>
+<!-- ===================== -->
+<!-- Dataset Overview -->
+<!-- ===================== -->
+<div class="mb-4 p-3 border rounded bg-light">
+    <h3 class="mb-1">{{ dataset.name }}</h3>
+    <p class="text-muted mb-0">
+        Rows: <strong>{{ num_rows }}</strong> |
+        Columns: <strong>{{ num_cols }}</strong>
+    </p>
+</div>
 
-<p><strong>Rows:</strong> {{ num_rows }}</p>
-<p><strong>Columns:</strong> {{ num_cols }}</p>
+<!-- ===================== -->
+<!-- Data Quality & Schema -->
+<!-- ===================== -->
+<div class="mb-5">
+    <h4 class="mb-3">Data Quality & Schema</h4>
 
-<h2>Column Details</h2>
+    {% if missing_chart_url %}
+    <div class="mb-4">
+        <img src="{{ missing_chart_url }}" class="img-fluid" alt="Missing Values Chart">
+    </div>
+    {% endif %}
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Column</th>
-        <th>Data Type</th>
-        <th>Missing Values</th>
-    </tr>
-    {% for col in columns %}
-    <tr>
-        <td>{{ col }}</td>
-        <td>{{ dtypes|get_item:col }}</td>
-        <td>{{ missing_values|get_item:col }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="row">
+        <div class="col-md-6">
+            <h6>Column Data Types</h6>
+            <ul class="list-group list-group-flush">
+                {% for col in columns %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ col }}</span>
+                    <span class="text-muted">{{ dtypes|get_item:col }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
 
-<h2>Visual Insights</h2>
+        <div class="col-md-6">
+            <h6>Missing Values</h6>
+            <ul class="list-group list-group-flush">
+                {% for col in columns %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ col }}</span>
+                    <span class="text-muted">{{ missing_values|get_item:col }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
 
-<h3>Missing Values Chart</h3>
-<img src="{{ missing_chart_url }}" alt="Missing Values Chart" width="800">
+<!-- ===================== -->
+<!-- Distribution Analysis -->
+<!-- ===================== -->
+<div class="mb-5">
+    <h4 class="mb-3">Distribution Analysis</h4>
 
-{% if numeric_columns %}
+    {% if numeric_columns %}
     <form method="get" class="mb-3">
-        <label class="form-label">Select numeric column:</label>
-        <select name="column" class="form-select" onchange="this.form.submit()">
+        <label class="form-label">Select numeric column</label>
+        <select name="column" class="form-select w-auto" onchange="this.form.submit()">
             {% for col in numeric_columns %}
-                <option value="{{ col }}" {% if col == selected_column %}selected{% endif %}>
-                    {{ col }}
-                </option>
+            <option value="{{ col }}" {% if col == selected_column %}selected{% endif %}>
+                {{ col }}
+            </option>
             {% endfor %}
         </select>
     </form>
-{% endif %}
+    {% endif %}
 
-{% if histogram_url %}
-<h3>Numeric Column Distribution</h3>
-<img src="{{ histogram_url }}" alt="Histogram" width="800">
-{% else %}
-<p>No numeric columns available for histogram.</p>
-{% endif %}
-<br>
+    {% if histogram_url %}
+    <div class="mb-4">
+        <h6>Histogram</h6>
+        <img src="{{ histogram_url }}" class="img-fluid" alt="Histogram">
+    </div>
+    {% else %}
+    <p class="text-muted">No numeric columns available for histogram.</p>
+    {% endif %}
 
-{% if boxplot_url %}
-  <hr>
-  <h5>Box Plot</h5>
-  <img src="{{ boxplot_url }}" class="img-fluid" alt="Box plot">
-{% endif %}
+    {% if boxplot_url %}
+    <div class="mb-4">
+        <h6>Box Plot</h6>
+        <img src="{{ boxplot_url }}" class="img-fluid" alt="Box plot">
+    </div>
+    {% endif %}
+</div>
 
+<!-- ===================== -->
+<!-- Numeric Comparison -->
+<!-- ===================== -->
 {% if multi_boxplot_url %}
-  <hr>
-  <h5>Numeric Columns Comparison</h5>
-  <img src="{{ multi_boxplot_url }}" class="img-fluid" alt="Multi-column box plot">
+<div class="mb-5">
+    <h4 class="mb-3">Numeric Column Comparison</h4>
+    <img src="{{ multi_boxplot_url }}" class="img-fluid" alt="Multi-column box plot">
+</div>
 {% endif %}
 
-<a href="/datasets/">← Back to My Datasets</a>
+<a href="/datasets/" class="btn btn-outline-secondary">
+    ← Back to My Datasets
+</a>
+
 {% endblock %}

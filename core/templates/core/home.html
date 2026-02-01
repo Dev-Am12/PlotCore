@@ -3,16 +3,95 @@
 {% block title %}Home - PlotCore{% endblock %}
 
 {% block content %}
-<div class="text-center mt-5">
-    <h1 class="mb-3">Welcome to PlotCore 📊</h1>
-    <p class="lead">
-        Upload CSV datasets and instantly visualize insights.
-    </p>
+<!-- Section 1 - Hero -->
+<div class="text-center py-5 mb-5 bg-light rounded">
+  <h1 class="fw-bold display-5">PlotCore</h1>
 
-    {% if not user.is_authenticated %}
-        <a href="/accounts/login/" class="btn btn-primary mt-3">
-            Get Started
-        </a>
-    {% endif %}
+  <p class="lead text-muted mt-3">
+    Upload, Analyze, Visualize Datasets with One Click.
+  </p>
+
+  <p class="mt-3 col-md-8 mx-auto">
+    PlotCore is a backend-focused data analytics tool that helps you
+    explore CSV datasets using Python, Pandas, and Matplotlib —
+    without writing analysis code yourself.
+  </p>
 </div>
+
+<hr>
+<!-- Section 2 - How PlotCore Works -->
+<div class="py-4">
+  <h4 class="text-center mb-4">How It Works</h4>
+
+  <div class="row text-center">
+    <div class="col-md-4">
+      <div class="p-3 border rounded h-100">
+        <h6>1. Upload</h6>
+        <p class="text-muted mb-0">
+          Upload your CSV dataset securely.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="p-3 border rounded h-100">
+        <h6>2. Analyze</h6>
+        <p class="text-muted mb-0">
+          Inspect structure, missing values, and data types.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="p-3 border rounded h-100">
+        <h6>3. Visualize</h6>
+        <p class="text-muted mb-0">
+          Explore distributions and outliers visually.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+<!-- Section 3 - Capabilities -->
+<div class="py-4">
+  <h4 class="mb-3">What You Can Do</h4>
+
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      Inspect dataset size, columns, and data types
+    </li>
+    <li class="list-group-item">
+      Analyze missing values across columns
+    </li>
+    <li class="list-group-item">
+      Visualize distributions using histograms and box plots
+    </li>
+    <li class="list-group-item">
+      Compare multiple numeric columns within a dataset
+    </li>
+    <li class="list-group-item">
+      Compare two datasets side-by-side
+    </li>
+  </ul>
+</div>
+
+<hr>
+<!-- Section 4 - Action -->
+<div class="py-4 text-center bg-light rounded">
+  {% if user.is_authenticated %}
+    <a href="/datasets/upload/" class="btn btn-primary me-2">
+      Upload Dataset
+    </a>
+    <a href="/datasets/" class="btn btn-outline-secondary">
+      View Datasets
+    </a>
+  {% else %}
+    <a href="/accounts/login/" class="btn btn-primary">
+      Get Started
+    </a>
+  {% endif %}
+</div>
+
 {% endblock %}

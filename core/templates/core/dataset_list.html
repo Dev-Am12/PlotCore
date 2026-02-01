@@ -32,6 +32,11 @@
     {% endfor %}
 </ul>
 {% else %}
-<p class="text-muted">No datasets uploaded yet.</p>
+<div class="text-center text-muted py-5">
+    <p>No datasets uploaded yet.</p>
+    <a href="/datasets/upload/" class="btn btn-primary">
+        Upload your first dataset
+    </a>
+</div>
 {% endif %}
 {% endblock %}
