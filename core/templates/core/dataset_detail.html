@@ -22,6 +22,21 @@
 </div>
 
 <!-- ===================== -->
+<!---- Insights ---->
+<!-- ===================== -->
+
+{% if insights %}
+  <div class="mb-4 p-3 border rounded bg-light">
+    <h6 class="mb-2">Insights</h6>
+    <ul class="mb-0">
+      {% for insight in insights %}
+        <li>{{ insight.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<!-- ===================== -->
 <!-- Data Quality & Schema -->
 <!-- ===================== -->
 <div class="mb-5">

@@ -19,6 +19,7 @@ from .analysis.comparison import (
     compare_dtypes,
     compare_missing_values,
 )
+from .analysis.insights import generate_insights
 
 def home(request):
     return render(request, 'core/home.html')
@@ -128,6 +129,9 @@ def dataset_detail(request, dataset_id):
             settings.MEDIA_ROOT
         )
 
+    # ---- Insights (basic) ----
+    insights = generate_insights(df, summary, numeric_cols)
+
     context = {
         'dataset': dataset,
         'num_rows': num_rows,
@@ -150,6 +154,7 @@ def dataset_detail(request, dataset_id):
         settings.MEDIA_URL + multi_boxplot_path
         if multi_boxplot_path else None
         ),
+        "insights": insights,
     }
 
     return render(request, 'core/dataset_detail.html', context)
