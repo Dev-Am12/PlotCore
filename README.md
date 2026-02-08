@@ -17,6 +17,7 @@ It is designed as a **backend-focused data analytics tool**, showcasing file han
 - 🗑️ Safe dataset deletion (DB + files + charts)
 - 🎨 Clean UI using Bootstrap
 - 🔒 Per-user data isolation
+- 🔍 Dataset Comparison
 
 ---
 
@@ -39,6 +40,7 @@ insighthub/
 ├── core/
 │ ├── views.py
 │ ├── models.py
+│ ├── analysis/
 │ ├── templates/
 │ ├── templatetags/
 │
